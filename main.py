@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 api = FastAPI(title = "My API", description = "My API description", version = "1.0.0")
 
@@ -19,6 +20,7 @@ users_db = [
         'subscription': 'free tier'
     }
 ]
+
 
 @api.get("/")
 def greatings():
@@ -49,3 +51,41 @@ def get_one_user_subcription(userid:int) -> dict:
         if user["user_id"] == userid:
             return {"subscription" : user["subscription"]}
     return {}
+
+class User(BaseModel):
+    user_id: int
+    name: str
+    subscription: str
+
+@api.put("/users")
+def put_users(user: User):
+    users_db.append({"user_id": user.user_id,
+                     "name": user.name,
+                     "subscription": user.subscription})
+    return user
+
+@api.post("/users/{userid:int}")
+def update_one_user(userid: int, user: dict) -> dict:
+    user_idx = None
+    for i, user in enumerate(users_db):
+        if user["user_id"] == userid:
+            user_idx = i
+            the_user = user
+    if user_idx is None:
+        return {}
+    
+    the_user = the_user | user
+    users_db[user_idx] = the_user
+    return the_user
+
+@api.delete("/users/{userid:int}")
+def remove_one_user(userid: int):
+    user_idx = None
+    for i, user in enumerate(users_db):
+        if user["user_id"] == userid:
+            user_idx = i
+    if user_idx is None:
+        return {}
+    pop = users_db.pop(user_idx)
+    return {"status": "success",
+            "user deleted": pop}

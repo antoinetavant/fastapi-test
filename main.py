@@ -1,7 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 from pydantic import BaseModel
 
-api = FastAPI(title = "My API", description = "My API description", version = "1.0.0")
+api = FastAPI(title = "My API", description = "My API description", version = "1.0.0", openapi_tags=[
+        {
+        'name': 'home',
+        'description': 'default functions'
+    },
+    {
+        'name': 'items',
+        'description': 'functions that are used to deal with items'
+    }
+])
 
 users_db = [
     {
@@ -22,12 +31,15 @@ users_db = [
 ]
 
 
-@api.get("/")
+@api.get("/",
+         name="Hellow World", 
+         tags=['home'])
 def greatings():
+    "Returns an Hello word"
     return "Bienvenu à mon API"
 
 
-@api.get("/users")
+@api.get("/users", tags=['home', 'items'])
 def get_all_users() -> list[dict]:
     return users_db
 
@@ -89,3 +101,28 @@ def remove_one_user(userid: int):
     pop = users_db.pop(user_idx)
     return {"status": "success",
             "user deleted": pop}
+
+@api.get('/headers')
+def get_headers(user_agent=Header(None)):
+    return {
+        'User-Agent': user_agent
+    }
+
+class Computer(BaseModel):
+    """A computer object"""
+    computerid: int
+    cpu: str | None = None
+    gpu: str | None = None
+    price: float
+
+@api.put("/computer", name="Create a new computer", tags=['home', 'items'])
+def put_computer(computer: Computer):
+    """Creates a new computer within the database
+    """
+    return computer
+
+@api.get("/cutom", name="Get custom Header")
+def get_content(custom_deader: str = Header(None, description='My own personal header')):
+    return {
+        "Custom-header" : custom_deader
+    }

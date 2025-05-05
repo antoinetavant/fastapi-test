@@ -3,10 +3,10 @@ name = "fastapi-test"
 version = "0.1.0"
 description = "A FastAPI dummy project"
 authors = [{name = "Antoine Tavant", email = "antoinetavant@hotmail.fr"}]
-requires-python = ">= 3.8"
+requires-python = ">= 3.12"
 dependencies = [
     "fastapi>=0.115.12",
-    "httptools==0.1",
+    "httptools",
     "uvicorn>=0.22.0",
     "uvloop>=0.21.0",
 ]

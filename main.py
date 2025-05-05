@@ -1,45 +1,51 @@
 from fastapi import FastAPI
 
-api = FastAPI()
+api = FastAPI(title = "My API", description = "My API description", version = "1.0.0")
 
-@api.get('/')
-def get_index():
-    return {
-        'method': 'get',
-        'endpoint': '/'
-        }
-
-@api.get('/other')
-def get_other():
-    return {
-        'method': 'get',
-        'endpoint': '/other'
+users_db = [
+    {
+        'user_id': 1,
+        'name': 'Alice',
+        'subscription': 'free tier'
+    },
+    {
+        'user_id': 2,
+        'name': 'Bob',
+        'subscription': 'premium tier'
+    },
+    {
+        'user_id': 3,
+        'name': 'Clementine',
+        'subscription': 'free tier'
     }
+]
 
-@api.post('/')
-def post_index():
-    return {
-        'method': 'post',
-        'endpoint': '/'
-        }
+@api.get("/")
+def greatings():
+    return "Bienvenu à mon API"
 
-@api.delete('/')
-def delete_index():
-    return {
-        'method': 'delete',
-        'endpoint': '/'
-        }
 
-@api.put('/')
-def put_index():
-    return {
-        'method': 'put',
-        'endpoint': '/'
-        }
+@api.get("/users")
+def get_all_users() -> list[dict]:
+    return users_db
 
-@api.patch('/')
-def patch_index():
-    return {
-        'method': 'patch',
-        'endpoint': '/'
-        }
+@api.get("/users/{userid:int}")
+def get_one_user(userid:int) -> dict:
+    for user in users_db:
+        if user["user_id"] == userid:
+            return user
+    return {}
+
+@api.get("/users/{userid:int}/name")
+def get_one_user_name(userid:int) -> dict:
+    for user in users_db:
+        if user["user_id"] == userid:
+            return {"name" : user["name"]}
+    return {}
+
+@api.get("/users/{userid:int}/subscription")
+def get_one_user_subcription(userid:int) -> dict:
+    for user in users_db:
+        if user["user_id"] == userid:
+            return {"subscription" : user["subscription"]}
+    return {}
